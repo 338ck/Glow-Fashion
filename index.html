@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Fashion Store</title>
+    <title>Vogue Lanka | Modern Fashion Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -27,15 +27,10 @@
             transform: translateX(0);
         }
 
-        .shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+        /* Active Category Style */
+        .category-active {
+            color: #4f46e5;
+            border-bottom: 2px solid #4f46e5;
         }
     </style>
 </head>
@@ -43,36 +38,38 @@
 
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div class="text-2xl font-bold tracking-tighter text-black uppercase">
-            Fashion<span class="text-indigo-600">Store</span>
+        <div class="text-2xl font-bold tracking-tighter text-black uppercase cursor-pointer" onclick="window.scrollTo(0,0)">
+            Vogue<span class="text-indigo-600">Lanka</span>
         </div>
         
         <div class="hidden md:flex space-x-8 font-medium">
             <a href="#" class="hover:text-indigo-600 transition">Home</a>
             <a href="#shop" class="hover:text-indigo-600 transition">Shop</a>
             <a href="#new" class="hover:text-indigo-600 transition">New Arrivals</a>
-            <a href="#about" class="hover:text-indigo-600 transition">About</a>
+            <a href="#footer" class="hover:text-indigo-600 transition">Contact</a>
         </div>
 
         <div class="flex items-center space-x-5">
-            <button class="hover:text-indigo-600 transition"><i class="fas fa-search"></i></button>
+            <div class="relative hidden sm:block">
+                <input type="text" onkeyup="searchProducts(this.value)" placeholder="Search..." class="pl-8 pr-4 py-1 border rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+            </div>
             <button onclick="toggleCart()" class="relative hover:text-indigo-600 transition">
                 <i class="fas fa-shopping-bag text-xl"></i>
                 <span id="cart-count" class="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">0</span>
             </button>
-            <button class="md:hidden" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <header class="relative h-[80vh] flex items-center justify-center bg-gray-900 text-white overflow-hidden">
         <div class="absolute inset-0 opacity-60">
-            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80" alt="Hero Background" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1441996236627-ef1e6277ee32?auto=format&fit=crop&w=1600&q=80" alt="Hero Background" class="w-full h-full object-cover">
         </div>
         <div class="relative z-10 text-center px-4">
             <h1 class="text-5xl md:text-7xl font-bold mb-6">Nawa Fashion Lokaya</h1>
             <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Aluthma styles, adu milaata. Adaama order karanna.</p>
-            <a href="#shop" class="bg-white text-black px-10 py-4 rounded-full font-bold hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-105">
+            <a href="#shop" class="bg-white text-black px-10 py-4 rounded-full font-bold hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-105 inline-block">
                 Shop Now
             </a>
         </div>
@@ -81,17 +78,17 @@
     <!-- Features -->
     <section class="py-12 bg-white border-b">
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
+            <div class="p-4">
                 <i class="fas fa-truck text-3xl text-indigo-600 mb-4"></i>
                 <h3 class="font-bold">Ikman Delivery</h3>
                 <p class="text-gray-500 text-sm">Dawas 2-3 athulatha gedaratama</p>
             </div>
-            <div>
+            <div class="p-4">
                 <i class="fas fa-undo text-3xl text-indigo-600 mb-4"></i>
                 <h3 class="font-bold">Dawas 7 Return</h3>
                 <p class="text-gray-500 text-sm">Onama prashnayakata maru kirime hakiyawa</p>
             </div>
-            <div>
+            <div class="p-4">
                 <i class="fas fa-lock text-3xl text-indigo-600 mb-4"></i>
                 <h3 class="font-bold">Arakshitha Gevim</h3>
                 <p class="text-gray-500 text-sm">Bank Card ho Cash on Delivery</p>
@@ -101,34 +98,42 @@
 
     <!-- Shop Section -->
     <main id="shop" class="container mx-auto px-6 py-16">
-        <div class="flex justify-between items-end mb-12">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-6 md:space-y-0">
             <div>
                 <h2 class="text-3xl font-bold">Latest Collections</h2>
                 <div class="h-1 w-20 bg-indigo-600 mt-2"></div>
             </div>
-            <div class="hidden sm:block">
-                <select class="border-none bg-transparent font-medium cursor-pointer focus:ring-0">
-                    <option>Sort by: Newest</option>
-                    <option>Price: Low to High</option>
-                    <option>Price: High to Low</option>
-                </select>
+            
+            <!-- Category Filters -->
+            <div class="flex flex-wrap justify-center gap-4 text-sm font-bold uppercase tracking-widest text-gray-500">
+                <button onclick="filterCategory('All', this)" class="category-btn category-active hover:text-indigo-600 transition pb-1">All</button>
+                <button onclick="filterCategory('Men', this)" class="category-btn hover:text-indigo-600 transition pb-1">Men</button>
+                <button onclick="filterCategory('Women', this)" class="category-btn hover:text-indigo-600 transition pb-1">Women</button>
+                <button onclick="filterCategory('Shoes', this)" class="category-btn hover:text-indigo-600 transition pb-1">Shoes</button>
+                <button onclick="filterCategory('Accessories', this)" class="category-btn hover:text-indigo-600 transition pb-1">Accessories</button>
             </div>
         </div>
 
         <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <!-- Products will be injected here -->
+            <!-- Products injected by JS -->
         </div>
     </main>
+
+    <!-- New Arrivals / Banner -->
+    <section id="new" class="bg-indigo-600 py-20 text-white text-center">
+        <h2 class="text-4xl font-bold mb-4">New Arrivals Just Landed!</h2>
+        <p class="mb-8 opacity-90">Stock thibena thuru adaama oba sathi order eka laba ganna.</p>
+        <button onclick="filterCategory('All')" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition">View Collection</button>
+    </section>
 
     <!-- Cart Sidebar -->
     <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 w-full sm:w-96 h-full bg-white z-[100] shadow-2xl flex flex-col">
         <div class="p-6 border-b flex justify-between items-center bg-gray-50">
             <h2 class="text-xl font-bold">Mage Cart Eka</h2>
-            <button onclick="toggleCart()" class="text-2xl">&times;</button>
+            <button onclick="toggleCart()" class="text-2xl hover:text-red-500 transition">&times;</button>
         </div>
         
         <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4">
-            <!-- Cart items will appear here -->
             <p class="text-gray-500 text-center py-10">Cart eka فاضි. Adaama shopping karanna!</p>
         </div>
 
@@ -144,30 +149,30 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-20">
+    <footer id="footer" class="bg-gray-900 text-gray-400 py-20">
         <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
             <div class="col-span-1 md:col-span-2">
-                <div class="text-2xl font-bold text-white mb-6">Fashion<span class="text-indigo-600">Store</span></div>
+                <div class="text-2xl font-bold text-white mb-6">Vogue<span class="text-indigo-600">Lanka</span></div>
                 <p class="max-w-sm mb-6">Lankawe hodama fashion items adu milaata ganna ekama thena. Api ekka ekathu wenna.</p>
                 <div class="flex space-x-4">
-                    <a href="#" class="hover:text-white transition text-xl"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="hover:text-white transition text-xl"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="hover:text-white transition text-xl"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://facebook.com" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-facebook"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/94770000000" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
             <div>
                 <h4 class="text-white font-bold mb-6">Links</h4>
                 <ul class="space-y-3">
-                    <li><a href="#" class="hover:text-white transition">Shop All</a></li>
-                    <li><a href="#" class="hover:text-white transition">Men's Wear</a></li>
-                    <li><a href="#" class="hover:text-white transition">Women's Wear</a></li>
-                    <li><a href="#" class="hover:text-white transition">Accessories</a></li>
+                    <li><button onclick="filterCategory('All')" class="hover:text-white transition">Shop All</button></li>
+                    <li><button onclick="filterCategory('Men')" class="hover:text-white transition">Men's Wear</button></li>
+                    <li><button onclick="filterCategory('Women')" class="hover:text-white transition">Women's Wear</button></li>
+                    <li><button onclick="filterCategory('Accessories')" class="hover:text-white transition">Accessories</button></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-white font-bold mb-6">Support</h4>
                 <ul class="space-y-3">
-                    <li><a href="#" class="hover:text-white transition">Contact Us</a></li>
+                    <li><a href="mailto:info@voguelanka.com" class="hover:text-white transition">Contact Us</a></li>
                     <li><a href="#" class="hover:text-white transition">Shipping Policy</a></li>
                     <li><a href="#" class="hover:text-white transition">Returns</a></li>
                     <li><a href="#" class="hover:text-white transition">FAQs</a></li>
@@ -175,14 +180,14 @@
             </div>
         </div>
         <div class="text-center mt-20 pt-8 border-t border-gray-800 text-sm">
-            &copy; 2024 Fashion Store. All rights reserved.
+            &copy; 2024 Vogue Lanka. All rights reserved.
         </div>
     </footer>
 
     <script>
         const products = [
             { id: 1, name: "Premium Cotton T-Shirt", price: 1850, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80", category: "Men" },
-            { id: 2, name: "Stylish Denim Jacket", price: 4500, image: "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?auto=format&fit=crop&w=500&q=80", category: "Unisex" },
+            { id: 2, name: "Stylish Denim Jacket", price: 4500, image: "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?auto=format&fit=crop&w=500&q=80", category: "Men" },
             { id: 3, name: "Summer Floral Dress", price: 3200, image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80", category: "Women" },
             { id: 4, name: "Classic White Sneakers", price: 5800, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80", category: "Shoes" },
             { id: 5, name: "Leather Crossbody Bag", price: 2900, image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=500&q=80", category: "Accessories" },
@@ -192,19 +197,21 @@
         ];
 
         let cart = [];
+        let currentFilter = 'All';
 
-        function renderProducts() {
+        function renderProducts(filteredList = products) {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = products.map(p => `
+            if (filteredList.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-500">Products kisiswak hamu une ne.</div>';
+                return;
+            }
+            grid.innerHTML = filteredList.map(p => `
                 <div class="group product-card bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
                     <div class="relative h-80 overflow-hidden">
                         <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="product-overlay absolute inset-0 bg-black bg-opacity-20 opacity-0 transition-opacity flex items-center justify-center space-x-4">
                             <button onclick="addToCart(${p.id})" class="bg-white text-black p-4 rounded-full hover:bg-indigo-600 hover:text-white transition transform hover:scale-110">
                                 <i class="fas fa-shopping-cart"></i>
-                            </button>
-                            <button class="bg-white text-black p-4 rounded-full hover:bg-pink-500 hover:text-white transition transform hover:scale-110">
-                                <i class="fas fa-heart"></i>
                             </button>
                         </div>
                     </div>
@@ -214,16 +221,40 @@
                         <div class="flex justify-between items-center">
                             <span class="text-xl font-bold">Rs. ${p.price.toLocaleString()}</span>
                             <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function filterCategory(cat, btn = null) {
+            currentFilter = cat;
+            
+            // UI Update for buttons
+            if(btn) {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
+                btn.classList.add('category-active');
+            }
+
+            const filtered = cat === 'All' ? products : products.filter(p => p.category === cat);
+            renderProducts(filtered);
+            
+            // Scroll to shop if coming from footer/new arrivals
+            if(!btn) {
+                document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+                // Also update the filter button highlight
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    if(b.innerText === cat) b.classList.add('category-active');
+                    else b.classList.remove('category-active');
+                });
+            }
+        }
+
+        function searchProducts(query) {
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()) || p.category.toLowerCase().includes(query.toLowerCase()));
+            renderProducts(filtered);
         }
 
         function toggleCart() {
@@ -233,25 +264,10 @@
         function addToCart(id) {
             const product = products.find(p => p.id === id);
             const existing = cart.find(item => item.id === id);
-            
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({...product, quantity: 1});
-            }
-            
+            if (existing) existing.quantity += 1;
+            else cart.push({...product, quantity: 1});
             updateCartUI();
-            
-            // Show feedback
-            const btn = event.currentTarget;
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            setTimeout(() => { btn.innerHTML = originalContent; }, 1000);
-            
-            // Open cart automatically on first add
-            if (cart.length === 1 && !document.getElementById('cart-sidebar').classList.contains('open')) {
-                toggleCart();
-            }
+            if (cart.length === 1) toggleCart();
         }
 
         function removeFromCart(id) {
@@ -263,11 +279,10 @@
             const cartItems = document.getElementById('cart-items');
             const cartCount = document.getElementById('cart-count');
             const cartTotal = document.getElementById('cart-total');
-            
             cartCount.innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
             
             if (cart.length === 0) {
-                cartItems.innerHTML = '<p class="text-gray-500 text-center py-10">Cart eka فاضි. Adaama shopping karanna!</p>';
+                cartItems.innerHTML = '<p class="text-gray-500 text-center py-10">Cart eka فاضි.</p>';
                 cartTotal.innerText = 'Rs. 0.00';
                 return;
             }
@@ -288,38 +303,18 @@
                     </div>
                 `;
             }).join('');
-            
             cartTotal.innerText = `Rs. ${total.toLocaleString()}.00`;
         }
 
         function checkout() {
-            if (cart.length === 0) {
-                alert("Obe cart eka فاضි!");
-                return;
-            }
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-50 px-4";
-            modal.innerHTML = `
-                <div class="bg-white rounded-2xl p-8 max-w-sm w-full text-center">
-                    <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-2">Order eka labuna!</h2>
-                    <p class="text-gray-600 mb-6">Obage order eka සාර්ථකයි. Ikmaninma api obawa sambanda karagannam.</p>
-                    <button onclick="this.closest('.fixed').remove(); cart=[]; updateCartUI(); toggleCart();" class="w-full bg-black text-white py-3 rounded-xl font-bold">
-                        Sthuthiy!
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            if (cart.length === 0) return;
+            alert("Order eka සාර්ථකයි! Sthuthiy.");
+            cart = [];
+            updateCartUI();
+            toggleCart();
         }
 
-        function toggleMobileMenu() {
-            // Simple mobile menu logic can be added here
-            alert("Mobile Menu functionality could be added here.");
-        }
-
-        window.onload = renderProducts;
+        window.onload = () => renderProducts();
     </script>
 </body>
 </html>
