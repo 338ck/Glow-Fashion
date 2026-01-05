@@ -1,319 +1,449 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vogue Lanka | Modern Fashion Store</title>
+    <title>Glow Fashion | Wear the Trend, Feel the Glow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap');
         
-        body {
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
+        :root {
+            --glow-pink: #FCE4EC;
+            --glow-gold: #D4AF37;
+            --glow-dark: #2D2D2D;
         }
 
-        .product-card:hover .product-overlay {
-            opacity: 1;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #fff; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        
+        .bg-soft-pink { background-color: #FFF0F5; }
+        .text-gold { color: #D4AF37; }
+        .btn-glow { @apply bg-[#D4AF37] text-white px-6 py-2 rounded-full transition-all hover:bg-[#B8962E] shadow-lg; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .cart-sidebar {
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(100%);
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 10px; }
 
-        .cart-sidebar.open {
-            transform: translateX(0);
-        }
-
-        /* Active Category Style */
-        .category-active {
-            color: #4f46e5;
-            border-bottom: 2px solid #4f46e5;
+        .modal-overlay {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="text-gray-800">
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div class="text-2xl font-bold tracking-tighter text-black uppercase cursor-pointer" onclick="window.scrollTo(0,0)">
-            Vogue<span class="text-indigo-600">Lanka</span>
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-pink-100 px-6 py-4 flex justify-between items-center">
+        <div class="text-2xl font-bold tracking-tighter text-gray-900 cursor-pointer" onclick="showPage('home')">
+            GLOW<span class="text-gold">FASHION</span>
         </div>
         
         <div class="hidden md:flex space-x-8 font-medium">
-            <a href="#" class="hover:text-indigo-600 transition">Home</a>
-            <a href="#shop" class="hover:text-indigo-600 transition">Shop</a>
-            <a href="#new" class="hover:text-indigo-600 transition">New Arrivals</a>
-            <a href="#footer" class="hover:text-indigo-600 transition">Contact</a>
+            <button onclick="showPage('home')" class="hover:text-gold transition">Home</button>
+            <button onclick="showPage('shop')" class="hover:text-gold transition">Shop</button>
+            <button onclick="filterCategory('Ladies')" class="hover:text-gold transition">Ladies</button>
+            <button onclick="filterCategory('Gents')" class="hover:text-gold transition">Gents</button>
+            <button onclick="filterCategory('Unisex')" class="hover:text-gold transition">Unisex</button>
         </div>
 
-        <div class="flex items-center space-x-5">
-            <div class="relative hidden sm:block">
-                <input type="text" onkeyup="searchProducts(this.value)" placeholder="Search..." class="pl-8 pr-4 py-1 border rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                <i class="fas fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+        <div class="flex items-center space-x-5 text-xl">
+            <!-- Fixed Search Placeholder -->
+            <div class="relative flex items-center">
+                <input type="text" id="search-input" placeholder="Search..." class="w-0 overflow-hidden transition-all duration-300 border-b border-gold focus:w-40 outline-none text-sm px-2">
+                <i class="fa-solid fa-magnifying-glass cursor-pointer hover:text-gold" onclick="focusSearch()"></i>
             </div>
-            <button onclick="toggleCart()" class="relative hover:text-indigo-600 transition">
-                <i class="fas fa-shopping-bag text-xl"></i>
-                <span id="cart-count" class="absolute -top-2 -right-2 bg-indigo-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">0</span>
-            </button>
+            
+            <div class="relative cursor-pointer" onclick="showPage('cart')">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-pink-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">0</span>
+            </div>
+            
+            <!-- Dynamic User Section -->
+            <div id="auth-section" class="relative group">
+                <i class="fa-solid fa-user cursor-pointer hover:text-gold" onclick="toggleLoginModal()"></i>
+                <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2">
+                    <div id="user-display-name" class="px-4 py-2 text-sm font-bold border-b mb-1"></div>
+                    <button onclick="handleLogout()" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition">Logout</button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative h-[80vh] flex items-center justify-center bg-gray-900 text-white overflow-hidden">
-        <div class="absolute inset-0 opacity-60">
-            <img src="https://images.unsplash.com/photo-1441996236627-ef1e6277ee32?auto=format&fit=crop&w=1600&q=80" alt="Hero Background" class="w-full h-full object-cover">
-        </div>
-        <div class="relative z-10 text-center px-4">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6">Nawa Fashion Lokaya</h1>
-            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Aluthma styles, adu milaata. Adaama order karanna.</p>
-            <a href="#shop" class="bg-white text-black px-10 py-4 rounded-full font-bold hover:bg-indigo-600 hover:text-white transition-all transform hover:scale-105 inline-block">
-                Shop Now
-            </a>
-        </div>
-    </header>
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-[100] modal-overlay hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden fade-in">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Welcome Back</h2>
+                    <button onclick="toggleLoginModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                
+                <div class="flex border-b mb-6">
+                    <button id="tab-user" onclick="switchLoginTab('user')" class="flex-1 pb-2 border-b-2 border-gold font-semibold">Customer</button>
+                    <button id="tab-admin" onclick="switchLoginTab('admin')" class="flex-1 pb-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600">Admin</button>
+                </div>
 
-    <!-- Features -->
-    <section class="py-12 bg-white border-b">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div class="p-4">
-                <i class="fas fa-truck text-3xl text-indigo-600 mb-4"></i>
-                <h3 class="font-bold">Ikman Delivery</h3>
-                <p class="text-gray-500 text-sm">Dawas 2-3 athulatha gedaratama</p>
+                <form id="login-form" class="space-y-4" onsubmit="handleLogin(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email / Username</label>
+                        <input type="text" id="login-id" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-gold focus:border-gold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-pass" required class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-gold focus:border-gold outline-none">
+                    </div>
+                    <button type="submit" class="btn-glow w-full py-3 mt-4">Login</button>
+                </form>
             </div>
-            <div class="p-4">
-                <i class="fas fa-undo text-3xl text-indigo-600 mb-4"></i>
-                <h3 class="font-bold">Dawas 7 Return</h3>
-                <p class="text-gray-500 text-sm">Onama prashnayakata maru kirime hakiyawa</p>
-            </div>
-            <div class="p-4">
-                <i class="fas fa-lock text-3xl text-indigo-600 mb-4"></i>
-                <h3 class="font-bold">Arakshitha Gevim</h3>
-                <p class="text-gray-500 text-sm">Bank Card ho Cash on Delivery</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Shop Section -->
-    <main id="shop" class="container mx-auto px-6 py-16">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-12 space-y-6 md:space-y-0">
-            <div>
-                <h2 class="text-3xl font-bold">Latest Collections</h2>
-                <div class="h-1 w-20 bg-indigo-600 mt-2"></div>
-            </div>
-            
-            <!-- Category Filters -->
-            <div class="flex flex-wrap justify-center gap-4 text-sm font-bold uppercase tracking-widest text-gray-500">
-                <button onclick="filterCategory('All', this)" class="category-btn category-active hover:text-indigo-600 transition pb-1">All</button>
-                <button onclick="filterCategory('Men', this)" class="category-btn hover:text-indigo-600 transition pb-1">Men</button>
-                <button onclick="filterCategory('Women', this)" class="category-btn hover:text-indigo-600 transition pb-1">Women</button>
-                <button onclick="filterCategory('Shoes', this)" class="category-btn hover:text-indigo-600 transition pb-1">Shoes</button>
-                <button onclick="filterCategory('Accessories', this)" class="category-btn hover:text-indigo-600 transition pb-1">Accessories</button>
-            </div>
-        </div>
-
-        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <!-- Products injected by JS -->
-        </div>
-    </main>
-
-    <!-- New Arrivals / Banner -->
-    <section id="new" class="bg-indigo-600 py-20 text-white text-center">
-        <h2 class="text-4xl font-bold mb-4">New Arrivals Just Landed!</h2>
-        <p class="mb-8 opacity-90">Stock thibena thuru adaama oba sathi order eka laba ganna.</p>
-        <button onclick="filterCategory('All')" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition">View Collection</button>
-    </section>
-
-    <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 w-full sm:w-96 h-full bg-white z-[100] shadow-2xl flex flex-col">
-        <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-            <h2 class="text-xl font-bold">Mage Cart Eka</h2>
-            <button onclick="toggleCart()" class="text-2xl hover:text-red-500 transition">&times;</button>
-        </div>
-        
-        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-4">
-            <p class="text-gray-500 text-center py-10">Cart eka فاضි. Adaama shopping karanna!</p>
-        </div>
-
-        <div class="p-6 border-t bg-gray-50">
-            <div class="flex justify-between mb-4 font-bold text-lg">
-                <span>Mulu Mudala:</span>
-                <span id="cart-total">Rs. 0.00</span>
-            </div>
-            <button onclick="checkout()" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-indigo-600 transition">
-                Checkout Karanna
-            </button>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer id="footer" class="bg-gray-900 text-gray-400 py-20">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div class="col-span-1 md:col-span-2">
-                <div class="text-2xl font-bold text-white mb-6">Vogue<span class="text-indigo-600">Lanka</span></div>
-                <p class="max-w-sm mb-6">Lankawe hodama fashion items adu milaata ganna ekama thena. Api ekka ekathu wenna.</p>
-                <div class="flex space-x-4">
-                    <a href="https://facebook.com" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-facebook"></i></a>
-                    <a href="https://instagram.com" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-instagram"></i></a>
-                    <a href="https://wa.me/94770000000" target="_blank" class="hover:text-white transition text-xl"><i class="fab fa-whatsapp"></i></a>
+    <!-- CONTENT AREA -->
+    <main id="main-content">
+        <!-- Home Page -->
+        <section id="page-home" class="fade-in">
+            <div class="relative h-[80vh] bg-soft-pink flex items-center overflow-hidden">
+                <div class="container mx-auto px-6 grid md:grid-cols-2 items-center">
+                    <div class="z-10">
+                        <span class="text-gold font-semibold tracking-widest uppercase text-sm">New Collection 2026</span>
+                        <h1 class="text-5xl md:text-7xl mt-4 leading-tight text-gray-900">Wear the Trend,<br>Feel the <span class="text-pink-400">Glow</span></h1>
+                        <p class="mt-6 text-gray-600 max-w-md">Discover the most elegant fashion trends curated for the modern Sri Lankan lifestyle.</p>
+                        <button class="btn-glow mt-8 text-lg" onclick="showPage('shop')">Explore Shop <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                    </div>
+                    <div class="hidden md:block relative h-full text-right">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800" alt="Model" class="inline-block relative z-10 h-[500px] w-auto object-cover rounded-3xl shadow-2xl transform rotate-2">
+                    </div>
                 </div>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6">Links</h4>
-                <ul class="space-y-3">
-                    <li><button onclick="filterCategory('All')" class="hover:text-white transition">Shop All</button></li>
-                    <li><button onclick="filterCategory('Men')" class="hover:text-white transition">Men's Wear</button></li>
-                    <li><button onclick="filterCategory('Women')" class="hover:text-white transition">Women's Wear</button></li>
-                    <li><button onclick="filterCategory('Accessories')" class="hover:text-white transition">Accessories</button></li>
-                </ul>
+
+            <div class="py-20 container mx-auto px-6">
+                <h2 class="text-3xl text-center mb-12">Shop by Category</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="group relative h-96 rounded-2xl overflow-hidden cursor-pointer" onclick="filterCategory('Ladies')">
+                        <img src="https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-black/30 flex items-end p-8 text-white"><h3 class="text-3xl">Ladies</h3></div>
+                    </div>
+                    <div class="group relative h-96 rounded-2xl overflow-hidden cursor-pointer" onclick="filterCategory('Gents')">
+                        <img src="https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-black/30 flex items-end p-8 text-white"><h3 class="text-3xl">Gents</h3></div>
+                    </div>
+                    <div class="group relative h-96 rounded-2xl overflow-hidden cursor-pointer" onclick="filterCategory('Unisex')">
+                        <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-black/30 flex items-end p-8 text-white"><h3 class="text-3xl">Unisex</h3></div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h4 class="text-white font-bold mb-6">Support</h4>
-                <ul class="space-y-3">
-                    <li><a href="mailto:info@voguelanka.com" class="hover:text-white transition">Contact Us</a></li>
-                    <li><a href="#" class="hover:text-white transition">Shipping Policy</a></li>
-                    <li><a href="#" class="hover:text-white transition">Returns</a></li>
-                    <li><a href="#" class="hover:text-white transition">FAQs</a></li>
-                </ul>
+        </section>
+
+        <!-- Shop Page -->
+        <section id="page-shop" class="hidden fade-in py-12 container mx-auto px-6">
+            <div class="flex flex-col md:flex-row gap-8">
+                <aside class="w-full md:w-64 space-y-8">
+                    <h4 class="font-bold border-b pb-2 mb-4">Categories</h4>
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2"><input type="checkbox" onclick="renderProducts()"> <span>Ladies Wear</span></label>
+                        <label class="flex items-center space-x-2"><input type="checkbox" onclick="renderProducts()"> <span>Gents Wear</span></label>
+                    </div>
+                </aside>
+                <div class="flex-1">
+                    <h2 class="text-2xl mb-8" id="shop-title">All Collections</h2>
+                    <div id="product-list" class="grid grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="text-center mt-20 pt-8 border-t border-gray-800 text-sm">
-            &copy; 2024 Vogue Lanka. All rights reserved.
-        </div>
+        </section>
+
+        <!-- Product Detail Page -->
+        <section id="page-product" class="hidden fade-in py-12 container mx-auto px-6">
+            <button onclick="showPage('shop')" class="text-gray-500 mb-8 hover:text-gold"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <div class="grid md:grid-cols-2 gap-12">
+                <img id="detail-img" src="" class="w-full rounded-2xl shadow-lg">
+                <div class="space-y-6">
+                    <h1 id="detail-title" class="text-4xl"></h1>
+                    <span id="detail-price" class="text-3xl font-bold text-gold"></span>
+                    <p class="text-gray-600">High quality premium fashion item.</p>
+                    <button class="btn-glow w-full h-14" onclick="addToCart()">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Page -->
+        <section id="page-cart" class="hidden fade-in py-12 container mx-auto px-6">
+            <h2 class="text-3xl mb-8">Shopping Cart</h2>
+            <div id="cart-items" class="space-y-4"></div>
+            <div class="mt-8 bg-gray-50 p-6 rounded-xl">
+                <div class="flex justify-between text-xl font-bold"><span>Total</span><span id="total-val">Rs. 0</span></div>
+                <button class="btn-glow w-full mt-4 py-4" onclick="checkout()">Checkout Now</button>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard -->
+        <section id="page-admin" class="hidden fade-in py-12 bg-gray-50 min-h-screen">
+            <div class="container mx-auto px-6">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800"><i class="fa-solid fa-gauge-high mr-2 text-gold"></i> Admin Dashboard</h1>
+                    <button class="bg-red-500 text-white px-6 py-2 rounded-lg" onclick="handleLogout()">Logout</button>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2 space-y-8">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <p class="text-gray-400 text-sm">Total Sales</p>
+                                <h3 class="text-xl font-bold">Rs. 1.2M</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <p class="text-gray-400 text-sm">Active Orders</p>
+                                <h3 class="text-xl font-bold">24</h3>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <p class="text-gray-400 text-sm">Products</p>
+                                <h3 class="text-xl font-bold" id="admin-product-count">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gold/20">
+                            <h2 class="text-xl font-bold mb-6 flex items-center"><i class="fa-solid fa-plus-circle mr-2 text-gold"></i> Add New Product</h2>
+                            <form id="add-product-form" onsubmit="adminAddProduct(event)" class="grid grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block text-sm mb-1">Product Name</label>
+                                    <input type="text" id="p-name" required class="w-full border p-2 rounded outline-none focus:ring-1 focus:ring-gold">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Price (Rs.)</label>
+                                    <input type="number" id="p-price" required class="w-full border p-2 rounded outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm mb-1">Category</label>
+                                    <select id="p-cat" class="w-full border p-2 rounded outline-none">
+                                        <option>Ladies</option>
+                                        <option>Gents</option>
+                                        <option>Unisex</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-sm mb-1">Image URL</label>
+                                    <input type="url" id="p-img" placeholder="https://images.unsplash.com/..." required class="w-full border p-2 rounded outline-none">
+                                </div>
+                                <button type="submit" class="col-span-2 bg-gray-900 text-white py-3 rounded-xl hover:bg-black transition font-bold">Update Inventory</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm">
+                        <h2 class="font-bold mb-4">Inventory Log</h2>
+                        <div id="admin-log" class="space-y-4 text-sm text-gray-500 h-[400px] overflow-y-auto">
+                            <p class="border-b pb-2 italic">Waiting for updates...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12 mt-20 text-center">
+        <p>&copy; 2026 Glow Fashion Sri Lanka. <span class="text-gold">Wear the Glow.</span></p>
     </footer>
 
     <script>
-        const products = [
-            { id: 1, name: "Premium Cotton T-Shirt", price: 1850, image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=500&q=80", category: "Men" },
-            { id: 2, name: "Stylish Denim Jacket", price: 4500, image: "https://images.unsplash.com/photo-1551537482-f2075a1d41f2?auto=format&fit=crop&w=500&q=80", category: "Men" },
-            { id: 3, name: "Summer Floral Dress", price: 3200, image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80", category: "Women" },
-            { id: 4, name: "Classic White Sneakers", price: 5800, image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=500&q=80", category: "Shoes" },
-            { id: 5, name: "Leather Crossbody Bag", price: 2900, image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=500&q=80", category: "Accessories" },
-            { id: 6, name: "Urban Cargo Pants", price: 3800, image: "https://images.unsplash.com/photo-1517441552335-fae6d809676a?auto=format&fit=crop&w=500&q=80", category: "Men" },
-            { id: 7, name: "Linen Button-Up Shirt", price: 2600, image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80", category: "Men" },
-            { id: 8, name: "Designer Sunglasses", price: 1500, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=500&q=80", category: "Accessories" }
+        // AUTH STATE
+        let isLoggedIn = false;
+        let currentUser = null;
+
+        // DATA STORE
+        let products = [
+            { id: 1, name: 'Linen Summer Dress', price: 4500, cat: 'Ladies', img: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=600' },
+            { id: 2, name: 'Classic Blue Shirt', price: 3200, cat: 'Gents', img: 'https://images.unsplash.com/photo-1588359348347-9bc6cbb6cf97?q=80&w=600' },
+            { id: 3, name: 'Elegant Evening Gown', price: 8900, cat: 'Ladies', img: 'https://images.unsplash.com/photo-1539008835279-43469383e844?q=80&w=600' }
         ];
 
-        let cart = [];
-        let currentFilter = 'All';
+        // NAVIGATION
+        function showPage(pageId) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            if(pageId === 'shop') renderProducts();
+            if(pageId === 'admin') updateAdminView();
+            window.scrollTo(0,0);
+        }
 
-        function renderProducts(filteredList = products) {
-            const grid = document.getElementById('product-grid');
-            if (filteredList.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-500">Products kisiswak hamu une ne.</div>';
-                return;
-            }
-            grid.innerHTML = filteredList.map(p => `
-                <div class="group product-card bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                    <div class="relative h-80 overflow-hidden">
-                        <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        <div class="product-overlay absolute inset-0 bg-black bg-opacity-20 opacity-0 transition-opacity flex items-center justify-center space-x-4">
-                            <button onclick="addToCart(${p.id})" class="bg-white text-black p-4 rounded-full hover:bg-indigo-600 hover:text-white transition transform hover:scale-110">
-                                <i class="fas fa-shopping-cart"></i>
-                            </button>
+        // SHOP LOGIC
+        function renderProducts(filter = '') {
+            const list = document.getElementById('product-list');
+            if(!list) return;
+            list.innerHTML = '';
+            const filtered = filter ? products.filter(p => p.cat === filter) : products;
+            
+            filtered.forEach(p => {
+                list.innerHTML += `
+                    <div class="group cursor-pointer" onclick="showProduct(${p.id})">
+                        <div class="relative h-80 overflow-hidden rounded-xl bg-gray-100">
+                            <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
                         </div>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-xs text-indigo-600 font-bold uppercase mb-1">${p.category}</p>
-                        <h3 class="font-bold text-lg mb-2 truncate">${p.name}</h3>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xl font-bold">Rs. ${p.price.toLocaleString()}</span>
-                            <div class="flex text-yellow-400 text-xs">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            </div>
+                        <div class="mt-4">
+                            <h3 class="font-medium">${p.name}</h3>
+                            <p class="text-gold font-bold">Rs. ${p.price.toLocaleString()}.00</p>
                         </div>
-                    </div>
-                </div>
-            `).join('');
+                    </div>`;
+            });
         }
 
-        function filterCategory(cat, btn = null) {
-            currentFilter = cat;
-            
-            // UI Update for buttons
-            if(btn) {
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('category-active'));
-                btn.classList.add('category-active');
-            }
-
-            const filtered = cat === 'All' ? products : products.filter(p => p.category === cat);
-            renderProducts(filtered);
-            
-            // Scroll to shop if coming from footer/new arrivals
-            if(!btn) {
-                document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
-                // Also update the filter button highlight
-                document.querySelectorAll('.category-btn').forEach(b => {
-                    if(b.innerText === cat) b.classList.add('category-active');
-                    else b.classList.remove('category-active');
-                });
-            }
+        function showProduct(id) {
+            const p = products.find(x => x.id === id);
+            document.getElementById('detail-title').innerText = p.name;
+            document.getElementById('detail-price').innerText = `Rs. ${p.price.toLocaleString()}.00`;
+            document.getElementById('detail-img').src = p.img;
+            showPage('product');
         }
 
-        function searchProducts(query) {
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query.toLowerCase()) || p.category.toLowerCase().includes(query.toLowerCase()));
-            renderProducts(filtered);
+        function filterCategory(cat) {
+            showPage('shop');
+            const titleEl = document.getElementById('shop-title');
+            if(titleEl) titleEl.innerText = `${cat} Collection`;
+            renderProducts(cat);
         }
 
-        function toggleCart() {
-            document.getElementById('cart-sidebar').classList.toggle('open');
+        // SEARCH FIX
+        function focusSearch() {
+            const input = document.getElementById('search-input');
+            input.classList.toggle('w-0');
+            input.classList.toggle('w-40');
+            input.focus();
         }
 
-        function addToCart(id) {
-            const product = products.find(p => p.id === id);
-            const existing = cart.find(item => item.id === id);
-            if (existing) existing.quantity += 1;
-            else cart.push({...product, quantity: 1});
-            updateCartUI();
-            if (cart.length === 1) toggleCart();
-        }
-
-        function removeFromCart(id) {
-            cart = cart.filter(item => item.id !== id);
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const cartItems = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const cartTotal = document.getElementById('cart-total');
-            cartCount.innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p class="text-gray-500 text-center py-10">Cart eka فاضි.</p>';
-                cartTotal.innerText = 'Rs. 0.00';
+        // ADMIN LOGIC
+        function adminAddProduct(e) {
+            e.preventDefault();
+            if(!isLoggedIn || currentUser.role !== 'admin') {
+                showNotification('Access Denied: Admin Login Required!');
                 return;
             }
 
-            let total = 0;
-            cartItems.innerHTML = cart.map(item => {
-                total += item.price * item.quantity;
-                return `
-                    <div class="flex items-center space-x-4 bg-gray-50 p-3 rounded-lg">
-                        <img src="${item.image}" class="w-16 h-16 object-cover rounded-md">
-                        <div class="flex-grow">
-                            <h4 class="font-bold text-sm truncate">${item.name}</h4>
-                            <p class="text-gray-500 text-xs">Rs. ${item.price.toLocaleString()} x ${item.quantity}</p>
-                        </div>
-                        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                `;
-            }).join('');
-            cartTotal.innerText = `Rs. ${total.toLocaleString()}.00`;
+            const newP = {
+                id: Date.now(),
+                name: document.getElementById('p-name').value,
+                price: parseInt(document.getElementById('p-price').value),
+                cat: document.getElementById('p-cat').value,
+                img: document.getElementById('p-img').value
+            };
+            products.unshift(newP); 
+            showNotification(`Product "${newP.name}" added!`);
+            e.target.reset();
+            updateAdminView();
+            
+            const log = document.getElementById('admin-log');
+            const entry = document.createElement('p');
+            entry.className = "border-b pb-2 text-green-600";
+            entry.innerHTML = `<b>ADDED:</b> ${newP.name} - ${new Date().toLocaleTimeString()}`;
+            log.prepend(entry);
+        }
+
+        function updateAdminView() {
+            const countEl = document.getElementById('admin-product-count');
+            if(countEl) countEl.innerText = products.length;
+        }
+
+        // AUTH SYSTEM
+        let currentLoginType = 'user';
+        function toggleLoginModal() { 
+            const modal = document.getElementById('login-modal');
+            if(isLoggedIn) {
+                document.getElementById('user-dropdown').classList.toggle('hidden');
+            } else {
+                modal.classList.toggle('hidden'); 
+            }
+        }
+
+        function switchLoginTab(type) {
+            currentLoginType = type;
+            document.getElementById('tab-user').style.borderColor = type === 'user' ? '#D4AF37' : 'transparent';
+            document.getElementById('tab-admin').style.borderColor = type === 'admin' ? '#D4AF37' : 'transparent';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('login-id').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (currentLoginType === 'admin') {
+                if (id === 'admin' && pass === 'admin') {
+                    loginSuccess(id, 'admin');
+                    showPage('admin');
+                } else {
+                    showNotification('Invalid Admin Credentials');
+                }
+            } else {
+                loginSuccess(id, 'user');
+                showPage('home');
+            }
+        }
+
+        function loginSuccess(name, role) {
+            isLoggedIn = true;
+            currentUser = { name, role };
+            document.getElementById('login-modal').classList.add('hidden');
+            updateAuthUI();
+            showNotification(`Welcome, ${name}!`);
+        }
+
+        function handleLogout() {
+            isLoggedIn = false;
+            currentUser = null;
+            updateAuthUI();
+            showPage('home');
+            showNotification('Logged out.');
+        }
+
+        function updateAuthUI() {
+            const userIcon = document.querySelector('.fa-user');
+            const dropdown = document.getElementById('user-dropdown');
+            const displayName = document.getElementById('user-display-name');
+
+            if(isLoggedIn) {
+                userIcon.classList.add('text-gold');
+                displayName.innerText = `Hi, ${currentUser.name}`;
+            } else {
+                userIcon.classList.remove('text-gold');
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        // UI HELPERS
+        function showNotification(msg) {
+            const toast = document.createElement('div');
+            toast.className = "fixed top-24 right-6 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl z-[200] fade-in border-l-4 border-gold";
+            toast.innerHTML = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function addToCart() {
+            let countEl = document.getElementById('cart-count');
+            let count = parseInt(countEl.innerText);
+            countEl.innerText = ++count;
+            showNotification('Item added to Bag!');
         }
 
         function checkout() {
-            if (cart.length === 0) return;
-            alert("Order eka සාර්ථකයි! Sthuthiy.");
-            cart = [];
-            updateCartUI();
-            toggleCart();
+            showNotification('Checkout system coming soon!');
         }
 
+        window.onclick = (e) => { 
+            const modal = document.getElementById('login-modal');
+            const authSec = document.getElementById('auth-section');
+            if(e.target === modal) modal.classList.add('hidden'); 
+            if(authSec && !authSec.contains(e.target)) {
+                document.getElementById('user-dropdown').classList.add('hidden');
+            }
+        }
+        
+        // Load default products
         window.onload = () => renderProducts();
     </script>
 </body>
